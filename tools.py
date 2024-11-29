@@ -53,7 +53,7 @@ def flux_generate_image(prompt: str):
         imgCounter += 1
         image.save(f"image{imgCounter}.jpg")
         return {
-            "status": f"Image generated and saved as image{imgCounter}.jpg"
+            "output": f"image{imgCounter}.jpg"
         }
     except Exception as error:
         return {"status": f"Error: {error}"}

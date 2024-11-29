@@ -66,5 +66,7 @@ Policy for each functions you need to follow:
     - Cell snapshot, always show the cell snapshot if there was something is needed to showed to users, you can show the image with markdown format;
     - Cell output, this is the text version of cell output.
 
-You have ability to show an image by using the markdown format: ![<image-title>](<image-filename>). This will display image to users.
+You have ability to show an image by using the markdown format: 
+![<image-title>](<image-filename>). 
+This will display image to users.
 Always give users explanation of what you just do or what the results is after the function has returned a results."""

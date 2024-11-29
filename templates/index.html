@@ -106,8 +106,15 @@
       text-align: left;
     }
 
-    .bubble img {
-      max-width: 100%;
+    .bubble.ai img {
+      max-width: 20vw;
+      height: auto;
+      border-radius: 4px;
+      cursor: pointer; /* Indicate that images are clickable */
+    }
+
+    .bubble.user img {
+      max-width: 20vw;
       height: auto;
       border-radius: 4px;
       cursor: pointer; /* Indicate that images are clickable */
@@ -201,6 +208,35 @@
       color: white;
       cursor: pointer;
     }
+    .file-upload-label {
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .upload-button {
+      padding: 7px 10px;
+      background: linear-gradient(135deg, #3d3d3d, #2d2c2c);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: background 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .upload-button:hover {
+      background: linear-gradient(315deg, #3d3d3d, #2d2c2c);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    .upload-button:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    tool_call{
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -208,6 +244,12 @@
     <h1>AI Chatbot</h1>
     <div id="messages"></div>
     <div id="input-container">
+      <div id="upload-container" style="display: block;">
+        <label for="file-upload" class="file-upload-label">
+          <input type="file" id="file-upload" accept="image/*" style="display: none;">
+          <span class="upload-button">+</span>
+        </label>
+      </div>
       <textarea id="usertext" placeholder="Type your message here..." rows="3"></textarea>
       <button type="button" id="send">Send</button>
     </div>
@@ -232,9 +274,74 @@
           return hljs.highlight(code, { language }).value;
         }
       })
-    );    
-    let isStreaming = false;
+    );
 
+    let isStreaming = false;
+    let images = [];
+
+    async function getImgCompatible() {
+      let imgCompatible = false;
+      const getCompatible = await fetch('/imgcompatible').then(response => response.json()).then(data => imgCompatible = data['message']);
+      getCompatible;
+      if (!imgCompatible){
+          document.getElementById('upload-container').style = 'display: none';
+      } else {
+          document.getElementById('upload-container').style = 'display: block';
+          userTextInput.addEventListener('paste', (event) => {
+            const clipboardData = event.clipboardData || window.clipboardData;
+            const items = clipboardData.items;
+
+            for (let i = 0; i < items.length; i++) {
+              const item = items[i];
+
+              if (item.type.startsWith('image/')) {
+                event.preventDefault(); // Prevent the default paste behavior
+
+                const file = item.getAsFile();
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                  const imageUrl = e.target.result; // Base64 encoded image
+                  const imageTag = `![Pasted Image](${imageUrl})`;
+
+                  // Add the image as a user message
+                  const imgInput = addMessage(imageTag, 'user');
+                  imgInput.querySelectorAll('img').forEach(img => {
+                    img.addEventListener('click', () => {
+                      openImagePopup(img.src);
+                    });
+                  });
+
+                  // Add to the images array for server submission
+                  images.push(imageUrl);
+                };
+
+                reader.readAsDataURL(file);
+                break; // Stop after the first image
+              }
+            }
+          });
+
+          document.getElementById('file-upload').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                const imageTag = `![Upload](${imageUrl})`;
+                const imginput = addMessage(imageTag, 'user');
+                imginput.querySelectorAll('img').forEach(img => {
+                  img.addEventListener('click', () => {
+                    openImagePopup(img.src);
+                  });
+                });
+                images.push(imageUrl);
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+      }
+    }
     async function resetConversation() {
       try {
         const response = await fetch('/resetconv', { method: 'POST' });
@@ -250,6 +357,7 @@
 
     window.onload = () => {
       resetConversation();
+      getImgCompatible();
     };
 
     const messagesDiv = document.getElementById('messages');
@@ -275,7 +383,7 @@
       }
 
       const userInput = userTextInput.value.trim();
-      if (!userInput) return;
+      if (!userInput && images.length === 0) return;
 
       sendButton.disabled = false;
       sendButton.textContent = 'Stop';
@@ -295,8 +403,9 @@
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({usertext: userInput})
+          body: JSON.stringify({usertext: userInput, images: images})
           });
+        images = []
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
 

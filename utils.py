@@ -20,22 +20,83 @@ def create_tools_json(tools):
 
 
 def query(url, payload, prompt):
-    payload['prompt'] = prompt
-    return requests.post(url + "/v1/completions", headers=headers, json=payload, stream=True)
+    payload['messages'] = prompt
+    return requests.post(url, headers=headers, json=payload, stream=True)
 
 
 def generate_prompt(chat_dict):
-    prompt = ""
+    prompt = []
     for i in chat_dict:
-        if i['role'] == 'system':
-            prompt += f"<|im_start|>system\n{i['content']}<|im_end|>\n"
-        elif i['role'] == 'user':
-            prompt += f"<|im_start|>user\n{i['content']}<|im_end|>\n"
-        elif i['role'] == 'assistant':
-            prompt += f"<|im_start|>assistant\n{i['content']}<|im_end|>\n"
-        elif i['role'] == 'tool':
-            prompt += f'<|im_start|>user'
+        if i['role'] == 'tool':
+            toolPrompt = ""
             for j in range(len(i['names'])):
-                prompt += f'\n<tool_response>\n{{"name": "{i["names"][j]}", "result": "{i["contents"][j]}"}}\n</tool_response>'
-            prompt += '<|im_end|>\n'
+                toolPrompt += f'\n<tool_response>\n{{"name": "{i["names"][j]}", "result": "{i["contents"][j]}"}}\n</tool_response>'
+            prompt.append(
+                {
+                    'role': 'user',
+                    'content': [
+                        {
+                            'type': 'text',
+                            'text': toolPrompt
+                        }
+                    ]
+                }
+            )
+        if i['role'] == 'system':
+            prompt.append(
+                {
+                    'role': 'system',
+                    'content': [
+                        {
+                            'type': 'text',
+                            'text': i['content']
+                        }
+                    ]
+                }
+            )
+        if i['role'] == 'assistant':
+            prompt.append(
+                {
+                    'role': 'assistant',
+                    'content': [
+                        {
+                            'type': 'text',
+                            'text': i['content']
+                        }
+                    ]
+                }
+            )
+        if i['role'] == 'user':
+            if 'image' in i.keys():
+                prompt.append(
+                    {
+                        'role': 'user',
+                        'content': [
+                            {
+                                'type': 'text',
+                                'text': i['content']
+                            }
+                        ]
+                    }
+                )
+                index = len(prompt)
+                for image in i['image']:
+                    prompt[index-1]['content'].append(
+                        {
+                            'type': 'image_url',
+                            'image_url': {'url': image}
+                        }
+                    )
+            else:
+                prompt.append(
+                    {
+                        'role': 'user',
+                        'content': [
+                            {
+                                'type': 'text',
+                                'text': i['content']
+                            }
+                        ]
+                    }
+                )
     return prompt
