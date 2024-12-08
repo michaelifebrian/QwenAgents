@@ -4,6 +4,8 @@ This project is a Flask-based web interface for deploying chatbot agents powered
 - **Customizable API Token:** Easily switch between different servers by updating the `apitoken.py` file.
 - **Configurable Prompts and Tool Integration:** Modify system prompts and extend the bot's capabilities by adding tools/functions in `prompt.py`.
 - **Colab Deployment:** Run the app using Google Colab with `ngrok` for public access.
+
+![Interface](https://github.com/michaelifebrian/QwenAgents/blob/main/interface.png?raw=true)
 ---
 ## Setup Instructions
 ### Installation
@@ -29,6 +31,8 @@ This project is a Flask-based web interface for deploying chatbot agents powered
 ### Configuration
 1. API Token (`apitoken.py`)
     - Update the `apimodel`, `URL`, and `API_TOKEN` variables to match the OpenAI-compatible server you are using.
+      
+      The template was working on Nebius.ai server as the template for VL and non-VL is the same. If you are using other server and using non-VL, you might want to change the chat template on `utils.py`
     - If your `tools.py` script requires additional tokens, you can store them here as well.
     - Example: 
         ```python
@@ -117,4 +121,6 @@ python3 app.py
     ```bash
     python3 app.py
     ```
-You can check the example for running in colab.
+3. On the terminal, a link will show up to redirect you to the web.
+
+    You can check the example for running in colab.
