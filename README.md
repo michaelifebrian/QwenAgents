@@ -64,8 +64,9 @@ You can enhance the chatbot's capabilities by adding or modifying tools:
         def store_name(name: str):
             """
             Store the user's name.
-            Parameters:
-                - name (str): The user's name.
+            
+            Args:
+                - name: The user's name.
             Returns:
                 Updated database.
             """
