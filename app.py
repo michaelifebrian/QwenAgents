@@ -4,9 +4,9 @@ import re
 from flask import Flask, Response, stream_with_context, request, render_template, jsonify, send_from_directory
 from utils import query, generate_prompt
 from prompt import system_prompt, toolsAlias, getFunction, parameters
-# from pyngrok import ngrok
 from sseclient import SSEClient
 from apitoken import URL, apimodel, imgCompatible
+# from pyngrok import ngrok
 # public_url = ngrok.connect(5000).public_url
 
 chat = []
