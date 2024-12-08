@@ -66,7 +66,7 @@ You can enhance the chatbot's capabilities by adding or modifying tools:
             Store the user's name.
             
             Args:
-                - name: The user's name.
+                name: The user's name.
             Returns:
                 Updated database.
             """
