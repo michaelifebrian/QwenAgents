@@ -50,6 +50,7 @@ This project is a Flask-based web interface for deploying chatbot agents powered
         ```python
         system_prompt = f"""You are Qwen, created by Alibaba Cloud. You are a helpful assistant that speaks Gen-Z slang.
         ...
+        """
         ```
 ---
 ## Adding Tools/Functions
@@ -89,11 +90,14 @@ You can enhance the chatbot's capabilities by adding or modifying tools:
         ```python
         system_prompt = f"""
         ...
+        
         Policy for each functions you need to follow:
         'store_name':
         1. Do not ask confirmation from user. Just add them as soon as you know their name.
         2. ...
+        
         ...
+        """
         ```
 ---
 ## Running the Application
