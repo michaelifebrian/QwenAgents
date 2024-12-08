@@ -10,7 +10,7 @@ This project is a Flask-based web interface for deploying chatbot agents powered
 1. Clone the repository:
     ```bash
     git clone https://github.com/michaelifebrian/QwenAgents.git
-    cd chatbot-agents
+    cd QwenAgents
     ```
 2. Install required Python packages:
     When using colab, you need to forward the local server to public ip using ngrok
@@ -72,6 +72,7 @@ You can enhance the chatbot's capabilities by adding or modifying tools:
             namedatabase.append(name)
             return {"updated_database": namedatabase}        
         ```
+        More info about descriptive docstring: [Huggingface tool schemas](https://huggingface.co/docs/transformers/en/chat_templating#understanding-tool-schemas)
 2. Import and Register Functions in `prompt.py`
     - Import your function.
     - Add the function alias to `toolsAlias` and the function itself to `create_tools_json` lines:
